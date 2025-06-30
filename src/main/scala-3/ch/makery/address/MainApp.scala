@@ -1,16 +1,39 @@
 package ch.makery.address
 
+import ch.makery.address.model.Person
 import javafx.fxml.FXMLLoader
 import scalafx.application.JFXApp3
 import scalafx.application.JFXApp3.PrimaryStage
 import scalafx.scene.Scene
 import scalafx.Includes.*
 import javafx.scene as jfxs
+import scalafx.beans.property.StringProperty
+import scalafx.collections.ObservableBuffer
 
 object MainApp extends JFXApp3:
 
   //Window Root Pane
   var roots: Option[scalafx.scene.layout.BorderPane] = None
+  //Window Root Pane
+
+
+  /**
+   * The data as an observable list of Persons.
+   */
+  val personData = new ObservableBuffer[Person]()
+
+  /**
+   * Constructor
+   */
+  personData += new Person("Hans", "Muster")
+  personData += new Person("Ruth", "Mueller")
+  personData += new Person("Heinz", "Kurz")
+  personData += new Person("Cornelia", "Meier")
+  personData += new Person("Werner", "Meyer")
+  personData += new Person("Lydia", "Kunz")
+  personData += new Person("Anna", "Best")
+  personData += new Person("Stefan", "Meier")
+  personData += new Person("Martin", "Mueller")
 
   override def start(): Unit =
     // transform path of RootLayout.fxml to URI for resource location.
@@ -37,3 +60,25 @@ object MainApp extends JFXApp3:
     loader.load()
     val roots = loader.getRoot[jfxs.layout.AnchorPane]
     this.roots.get.center = roots
+
+//  val stringA = new StringProperty("Sunway")
+//  val stringB = new StringProperty("Monash")
+//  val stringC = new StringProperty("Taylor")
+//
+//  stringA.onChange((a, b, c) => {
+//    println("a has change value from " + b + "to" + c)
+//  })
+//
+//  stringB.<==(stringA)
+//  stringC.<==(stringA)
+//  stringA.value = "segi"
+//  stringC.value = "utm"
+//
+//  println("stirng a value " + stringA.value)
+//  println("String b value" + stringB.value)
+//  println("String c value" + stringC.value)
+//
+//
+//
+//  val add = (a: Int, b: Int) => {a+b}
+//  println(add(1,2))
