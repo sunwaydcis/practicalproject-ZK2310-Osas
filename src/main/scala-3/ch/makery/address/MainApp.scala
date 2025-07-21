@@ -1,6 +1,7 @@
 package ch.makery.address
 
 import ch.makery.address.model.Person
+import ch.makery.address.view.{PersonEditDialogController, PersonOverviewController}
 import javafx.fxml.FXMLLoader
 import scalafx.application.JFXApp3
 import scalafx.application.JFXApp3.PrimaryStage
@@ -9,6 +10,8 @@ import scalafx.Includes.*
 import javafx.scene as jfxs
 import scalafx.beans.property.StringProperty
 import scalafx.collections.ObservableBuffer
+import scalafx.scene.image.Image
+import scalafx.stage.{Modality, Stage}
 
 object MainApp extends JFXApp3:
 
@@ -16,7 +19,8 @@ object MainApp extends JFXApp3:
   var roots: Option[scalafx.scene.layout.BorderPane] = None
   //Window Root Pane
 
-
+  var cssResource = getClass.getResource("view/DarkTheme.css")
+  var overviewController: Option[PersonOverviewController] = None
   /**
    * The data as an observable list of Persons.
    */
@@ -48,8 +52,13 @@ object MainApp extends JFXApp3:
 
     stage = new PrimaryStage():
       title = "AddressApp"
+      icons += new Image(getClass.getResource("/images/86957_address_book_icon.png").toExternalForm)
       scene = new Scene():
+        stylesheets = Seq(cssResource.toExternalForm)
         root = roots.get
+
+
+
 
     // call to display PersonOverview when app start
     showPersonOverview()
@@ -59,26 +68,51 @@ object MainApp extends JFXApp3:
     val loader = new FXMLLoader(resource)
     loader.load()
     val roots = loader.getRoot[jfxs.layout.AnchorPane]
+    val ctrl = loader.getController[PersonOverviewController]
+    overviewController = Option(ctrl)
     this.roots.get.center = roots
 
-//  val stringA = new StringProperty("Sunway")
-//  val stringB = new StringProperty("Monash")
-//  val stringC = new StringProperty("Taylor")
+  def showPersonEditDialog(person: Person): Boolean =
+    val resource = getClass.getResource("view/PersonEditDialog.fxml")
+    val loader = new FXMLLoader(resource)
+    loader.load();
+    val roots2 = loader.getRoot[jfxs.Parent]
+    val control = loader.getController[PersonEditDialogController]
+
+    val dialog = new Stage():
+      initModality(Modality.ApplicationModal)
+      initOwner(stage)
+      scene = new Scene:
+        root = roots2
+        stylesheets = Seq(cssResource.toExternalForm)
+
+    control.dialogStage = dialog
+    control.person = person
+    dialog.showAndWait()
+
+    control.okClicked
+
+
+
+
+
+
+//    val stringA =  new StringProperty("Sunway") //publisher
+//    val stringB = new StringProperty("Monash") //subscriber
+//    val stringC = new StringProperty("Taylor") //subscriber
 //
-//  stringA.onChange((a, b, c) => {
-//    println("a has change value from " + b + "to" + c)
-//  })
+//    stringB.<==(stringA)
+//    stringC.<==(stringA)
+//    stringA.value= "Segi"
+//    stringC.value = "UTM"
 //
-//  stringB.<==(stringA)
-//  stringC.<==(stringA)
-//  stringA.value = "segi"
-//  stringC.value = "utm"
+//    println("String A value:" + stringA.value)
+//    println("String B value:" + stringB.value)
+//    println("String C value:" + stringC.value)
+//    stringA.onChange((a,b,c) => {
+//      println("a has changed value from" + b + "to" + c)
+//    })
+//    stringA.value = "Monash"
 //
-//  println("stirng a value " + stringA.value)
-//  println("String b value" + stringB.value)
-//  println("String c value" + stringC.value)
-//
-//
-//
-//  val add = (a: Int, b: Int) => {a+b}
-//  println(add(1,2))
+//    val add:(Int, Int) => Int = (a: Int, b: Int) => {a + b}
+//    println(add(1,2))

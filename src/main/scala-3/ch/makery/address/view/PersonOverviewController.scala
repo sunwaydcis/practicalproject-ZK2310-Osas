@@ -1,11 +1,12 @@
+
 package ch.makery.address.view
 import ch.makery.address.model.Person
 import ch.makery.address.MainApp
+import javafx.beans.binding.Bindings
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.scene.control.{Label, TableColumn, TableView}
 import scalafx.Includes.*
-import scalafx.beans.binding.Bindings
 import scalafx.scene.control.Alert
 import scalafx.scene.control.Alert.AlertType
 @FXML
@@ -33,18 +34,15 @@ class PersonOverviewController():
     // initialize Table View display contents model
     personTable.items = MainApp.personData
     // initialize columns's cell values
-    firstNameColumn.cellValueFactory = {
-      _.value.firstName
-    }
-    lastNameColumn.cellValueFactory = {
-      _.value.lastName
-    }
+    firstNameColumn.cellValueFactory = {_.value.firstName}
+    lastNameColumn.cellValueFactory  = {_.value.lastName}
 
     showPersonDetails(None);
 
-    personTable.selectionModel().selectedItem.onChange(
+    personTable.selectionModel.value.selectedItem.onChange(
       (_, _, newValue) => showPersonDetails(Option(newValue))
     )
+
 
   private def showPersonDetails(person: Option[Person]): Unit =
     person match
@@ -55,12 +53,11 @@ class PersonOverviewController():
         lastNameLabel.text <== person.lastName
         streetLabel.text <== person.street
         cityLabel.text <== person.city;
-        postalCodeLabel.text = person.postalCode.value.toString
-        birthdayLabel.text<== Bindings.createStringBinding(
+        postalCodeLabel.text <== person.postalCode.delegate.asString()
+        birthdayLabel.text <== Bindings.createStringBinding(
           () => {
             person.date.value.asString
-          }, person.date
-
+          },person.date
         )
 
       case None =>
@@ -72,21 +69,21 @@ class PersonOverviewController():
         cityLabel.text.unbind()
         birthdayLabel.text.unbind()
 
-
         firstNameLabel.text = ""
         lastNameLabel.text = ""
         streetLabel.text = ""
         postalCodeLabel.text = ""
         cityLabel.text = ""
         birthdayLabel.text = ""
-
-
   @FXML
-  def handleDeletePerson(action: ActionEvent): Unit =
-    
+  /**
+   * Called when the user clicks on the delete button.
+   */
+  def handleDeletePerson(action: ActionEvent) =
     val selectedIndex = personTable.selectionModel().selectedIndex.value
     if (selectedIndex >= 0) then
-      personTable.items().remove(selectedIndex);
+      personTable.items().remove(selectedIndex)
+    //MainApp.personData.remove(selectedIndex);
     else
       // Nothing selected.
       val alert = new Alert(AlertType.Warning):
@@ -95,4 +92,25 @@ class PersonOverviewController():
         headerText = "No Person Selected"
         contentText = "Please select a person in the table."
       .showAndWait()
+  @FXML
+  def handleNewPerson(action: ActionEvent) =
+    val person = new Person("", "")
+    val okClicked = MainApp.showPersonEditDialog(person);
+    if (okClicked) then
+      MainApp.personData += person
+  @FXML
+  def handleEditPerson(action: ActionEvent) =
+    val selectedPerson = personTable.selectionModel().selectedItem.value
+    if (selectedPerson != null) then
+      val okClicked = MainApp.showPersonEditDialog(selectedPerson)
 
+      if (okClicked) then showPersonDetails(Some(selectedPerson))
+
+    else
+      // Nothing selected.
+      val alert = new Alert(Alert.AlertType.Warning):
+        initOwner(MainApp.stage)
+        title = "No Selection"
+        headerText = "No Person Selected"
+        contentText = "Please select a person in the table."
+      .showAndWait()
