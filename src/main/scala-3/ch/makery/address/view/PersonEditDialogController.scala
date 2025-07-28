@@ -49,7 +49,7 @@ class PersonEditDialogController ():
       __person.street    <== streetField.text
       __person.city      <== cityField.text
       __person.postalCode.value = postalCodeField.getText().toInt
-      __person.date.value       = birthdayField.text.value.parseLocalDate;
+      __person.date.value       = birthdayField.text.value.parseLocalDate.getOrElse(null);
 
       okClicked = true
       dialogStage.close()
